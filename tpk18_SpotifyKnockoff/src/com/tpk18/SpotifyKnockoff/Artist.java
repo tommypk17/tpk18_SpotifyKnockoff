@@ -65,16 +65,6 @@ public class Artist {
 		}
 		
 	}
-	/**
-	 * Destroys all data about this object
-	 */
-	private void destroyObject(){
-		this.artistID = null;
-		this.firstName = null;
-		this.lastName = null;
-		this.bandName = null;
-		this.bio = null;
-	}
     /**
      * This method is used to remove a specific Artist based on the artistID as a String
      * @param artistID - artist id as String
@@ -84,8 +74,6 @@ public class Artist {
 		DbUtilities db = new DbUtilities();
 		db.executeQuery(sql);
 		db.closeDbConnection();
-		//delete song object
-		destroyObject();
 	}
 	
 	
@@ -118,6 +106,19 @@ public class Artist {
      */
 	public String getBio() {
 		return bio;
+	}
+	public void setBio(String bio) {
+		this.bio = bio;
+		String sql = "UPDATE artist SET bio = '"+bio+"' WHERE artist_id = '"+this.artistID+"';";
+		try {
+			DbUtilities db = new DbUtilities();
+			db.executeQuery(sql);
+			db.closeDbConnection();
+			db = null;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 }

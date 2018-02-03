@@ -82,7 +82,6 @@ public class Album {
 				this.recordingCompany = rs.getString("recording_company_name");
 				this.pmrcRating = rs.getString("PMRC_rating");
 				this.length = rs.getDouble("length");
-				
 			}
 			db.closeDbConnection();
 			db = null;
@@ -91,19 +90,7 @@ public class Album {
 		}
 		
 	}
-	/**
-	 * Destroys all data about this object
-	 */
-	private void destroyObject(){
-		this.albumID = null;
-		this.title = null;
-		this.releaseDate = null;
-		this.coverImagePath = null;
-		this.numberOfTracks = Integer.valueOf(null);
-		this.recordingCompany = null;
-		this.pmrcRating = null;
-		this.length = Integer.valueOf(null);
-	}
+
     /**
      * This method is used to remove a specific Album based on the albumID as a String
      * @param albumID - album id as String
@@ -118,15 +105,24 @@ public class Album {
 		DbUtilities db = new DbUtilities();
 		db.executeQuery(sql);
 		db.closeDbConnection();
-		//delete song object
-		destroyObject();
 	}
     /**
      * This method is used to add a specific song to the Album list
      * @param song - song object
      */
 	public void addSong(Song song) {
+		try{
 		this.albumSongs.put(song.getSongID(), song);
+		DbUtilities db = new DbUtilities();
+		if(this.getAlbumID() != null){
+			String sql = "INSERT INTO album_song(fk_album_id, fk_song_id) VALUES('"+this.getAlbumID()+"' ,'"+song.getSongID()+"');";
+			db.executeQuery(sql);
+			db.closeDbConnection();
+			System.out.println("Succesfully added song-album relationship");
+		}
+		}catch(Exception e){
+			System.out.println("An error has occured when trying to add song-album realtionship!");
+		}
 	}
     /**
      * This method is used to remove a specific song from the Album list
@@ -141,9 +137,7 @@ public class Album {
      */
 	public void deleteSong(String songID) {
 		this.albumSongs.remove(songID);
-	}
-	
-	
+	}	
     /**
      * @return ID of this Album Instance
      */
@@ -168,7 +162,11 @@ public class Album {
 	public String getCoverImagePath() {
 		return coverImagePath;
 	}
-    /**
+	
+    public void setCoverImagePath(String coverImagePath) {
+		this.coverImagePath = coverImagePath;
+	}
+	/**
      * @return Recording Company Name of this Album Instance
      */
 	public String getRecordingCompany() {
@@ -198,4 +196,5 @@ public class Album {
 	public Map<String, Song> getAlbumSongs() {
 		return albumSongs;
 	}
+	
 }

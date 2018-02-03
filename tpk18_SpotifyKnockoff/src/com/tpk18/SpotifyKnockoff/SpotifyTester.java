@@ -1,15 +1,10 @@
 package com.tpk18.SpotifyKnockoff;
-
-
-import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class SpotifyTester {
 	static Scanner siStrings = new Scanner(System.in);
 	static Scanner siDoubles = new Scanner(System.in);
-	static ArrayList<Song> songs;
-	static ArrayList<Album> albums;
 	static DbUtilities db = new DbUtilities();
 	
 	public static void main(String[] args) {
@@ -17,16 +12,16 @@ public class SpotifyTester {
 		
 		boolean stop = false;
 		while(!stop){
-		System.out.println("Here are actions you can perform:");
+		System.out.println("Here are actions you can perform:\n");
 		System.out.println("\tFind a song(1)");
 		System.out.println("\tAdd a song(2)");
 		System.out.println("\tDelete a song(3)");
 		System.out.println("\tFind an Album(4)");
 		System.out.println("\tAdd an Album(5)");
 		System.out.println("\tDelete an Album(6)");
-//		System.out.println("\tFind an Album(7)");
-//		System.out.println("\tAdd an Album(8)");
-//		System.out.println("\tDelete an Album(9)");
+		System.out.println("\tFind an Artist(7)");
+		System.out.println("\tAdd an Artist(8)");
+		System.out.println("\tDelete an Artist(9)\n");
 		System.out.println("Please enter an Integer from above:");
 		int choice = (int) siDoubles.nextDouble();
 		switch(choice){
@@ -47,14 +42,48 @@ public class SpotifyTester {
 		}
 		
 	}
-	private static void findArtist() {
-		
+	private static Artist findArtist() {
+		System.out.println("Please enter the ID of the Artist you are looking for, or n to cancel");
+		Artist foundArtist = new Artist(siStrings.nextLine());
+		System.out.println();
+		if(foundArtist.getArtistID() != null){
+			System.out.println("Found Artist!\nTitle: "+foundArtist.getFirstName());
+			System.out.println("Last Name: "+foundArtist.getLastName());
+			System.out.println("Band: "+foundArtist.getBandName());
+			System.out.println("Bio: "+foundArtist.getBio());
+		}else{
+			System.out.println("Couldnt find Artist!");
+		}
+		System.out.println();
+		return foundArtist;
 	}
 	private static void addArtist() {
+		String artistFirstName, artistLastName, artistBio, artistBandName;
+		System.out.println("Artist First Name: ");
+		artistFirstName = siStrings.nextLine();
+		System.out.println("Artist Last Name: ");
+		artistLastName= siStrings.nextLine();
+		System.out.println("Bio: ");
+		artistBio = siStrings.nextLine();
+		System.out.println("Artist Band Name: ");
+		artistBandName = siStrings.nextLine();
+		Artist artist = new Artist(artistFirstName, artistLastName, artistBandName);
+		if(!artistBio.isEmpty()){
+			artist.setBio(artistBio);
+		}
 		
 	}
 	private static void deleteArtist() {
-		
+		Artist artist = findArtist();
+		System.out.println("Are you sure you want to delete this artist? y/n: ");
+		if(siStrings.nextLine().equalsIgnoreCase("y")){
+			artist.deleteArtist(artist.getArtistID());
+			System.out.println("artist deleted!");
+		}
+		else{
+			System.out.println("No artists were deleted");
+		}
+		System.out.println();
 	}
 	private static void deleteAlbum() {
 		Album album = findAlbum();
@@ -71,8 +100,7 @@ public class SpotifyTester {
 
 	private static Album addAlbum() {
 		// TODO Auto-generated method stub
-		String albumID = "";
-		String albumTitle, albumReleaseDate, coverImagePath, recordingCompanyName, pmrcRating;
+		String albumTitle, albumReleaseDate, recordingCompanyName, pmrcRating;
 		int numOfTracks;
 		double albumLength;
 		System.out.println("Add a new album");
@@ -89,8 +117,6 @@ public class SpotifyTester {
 		}
 		System.out.println("Release Date: ");
 		albumReleaseDate = siStrings.nextLine();
-		System.out.println("Image File Path: ");
-		coverImagePath= siStrings.nextLine();
 		System.out.println("Record company name: ");
 		recordingCompanyName = siStrings.nextLine();
 		System.out.println("PMRC Rating: ");
@@ -98,7 +124,6 @@ public class SpotifyTester {
 		System.out.println("Number of tracks: ");
 		numOfTracks = siStrings.nextInt();
 		Album album = new Album(albumTitle, albumReleaseDate, recordingCompanyName, numOfTracks, pmrcRating, albumLength);
-		albumID = album.getAlbumID();
 		return album;
 	}
 
@@ -127,6 +152,7 @@ public class SpotifyTester {
 		System.out.println("Are you sure you want to delete this song? y/n: ");
 		if(siStrings.nextLine().equalsIgnoreCase("y")){
 			song.deleteSong(song.getSongID());
+			
 			System.out.println("song deleted!");
 		}
 		else{
@@ -153,16 +179,6 @@ public class SpotifyTester {
 		}
 		System.out.println("Release Date: ");
 		releaseDate = siStrings.nextLine();
-		System.out.println("Would you like to link this to an album? y/n");
-		albumID = null;
-//		if(siStrings.nextLine().equalsIgnoreCase("y")) {
-//			System.out.println("Please enter the Album ID: ");
-//			albumID = siStrings.nextLine();
-//			Album album = new Album(albumID);
-//			if(album.getAlbumID() != null){
-////				String sql = "INSERT INTO album_song VALUES("+songID+") WHERE"
-//			}
-//		}
 		System.out.println("Record date: ");
 		recordDate = siStrings.nextLine();
 		
@@ -170,9 +186,13 @@ public class SpotifyTester {
 		System.out.println("Creating new DB Record");
 		song = new Song(title, length, releaseDate, recordDate);
 		System.out.println("Song Created!");
-		song = new Song(song.getSongID());
-		System.out.println("\tName: "+ song.getTitle());
-		System.out.println("\tLength: "+ song.getLength());
+		System.out.println("Would you like to link this to an album? y/n");
+		if(siStrings.nextLine().equalsIgnoreCase("y")) {
+			System.out.println("Please enter the Album ID: ");
+			albumID = siStrings.nextLine();
+			Album album = new Album(albumID);
+			album.addSong(song);
+		}
 	}
 
 	private static Song findSong() {

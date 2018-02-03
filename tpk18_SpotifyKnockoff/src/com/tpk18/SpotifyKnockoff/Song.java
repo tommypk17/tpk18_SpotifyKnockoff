@@ -30,7 +30,7 @@ public class Song {
 			while(rs.next()){
 				this.songID = rs.getString("song_id");
 				this.title = rs.getString("title");
-//				this.filePath = rs.getString("file_path");
+				this.filePath = rs.getString("file_path");
 				this.releaseDate = rs.getDate("release_date").toString();
 				this.recordDate = rs.getDate("record_date").toString();
 				this.length = rs.getDouble("length");
@@ -55,7 +55,7 @@ public class Song {
 		this.songID = UUID.randomUUID().toString();
 		
 		String sql = "INSERT INTO song (song_id,title,length,release_date,record_date) ";
-		sql += "VALUES (?, ?, ?, ?, ?, ?);";
+		sql += "VALUES (?, ?, ?, ?, ?);";
 		
 		try {
 			DbUtilities db = new DbUtilities();
@@ -154,7 +154,7 @@ public class Song {
 	}
 	public void setFilePath(String filePath) {
 		this.filePath = filePath;
-		String sql = "UPDATE song SET file_path = "+filePath+" WHERE song_id = "+this.songID+";";
+		String sql = "UPDATE song SET file_path = '"+filePath+"' WHERE song_id = '"+this.songID+"';";
 		
 		try {
 			DbUtilities db = new DbUtilities();
