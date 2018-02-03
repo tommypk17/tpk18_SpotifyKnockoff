@@ -84,13 +84,6 @@ public class Album {
 				this.length = rs.getDouble("length");
 				
 			}
-			sql = "SELECT song_id, fk_album_id FROM song WHERE fk_album_id = '" + albumID + "';";
-			rs = db.getResultSet(sql);
-			while(rs.next()){
-				Song song = new Song(rs.getString("song_id"));
-				albumSongs.put(song.getSongID(), song);
-			}
-			
 			db.closeDbConnection();
 			db = null;
 		} catch (SQLException e) {

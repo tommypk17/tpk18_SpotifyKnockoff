@@ -1,12 +1,9 @@
 package com.tpk18.SpotifyKnockoff;
 
-import java.awt.image.DataBufferUShort;
-import java.sql.*;
+
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
-
-import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 
 public class SpotifyTester {
 	static Scanner siStrings = new Scanner(System.in);
@@ -16,8 +13,7 @@ public class SpotifyTester {
 	static DbUtilities db = new DbUtilities();
 	
 	public static void main(String[] args) {
-		buildSongObjects();
-		buildAlbumObjects();
+
 		
 		boolean stop = false;
 		while(!stop){
@@ -28,6 +24,9 @@ public class SpotifyTester {
 		System.out.println("\tFind an Album(4)");
 		System.out.println("\tAdd an Album(5)");
 		System.out.println("\tDelete an Album(6)");
+//		System.out.println("\tFind an Album(7)");
+//		System.out.println("\tAdd an Album(8)");
+//		System.out.println("\tDelete an Album(9)");
 		System.out.println("Please enter an Integer from above:");
 		int choice = (int) siDoubles.nextDouble();
 		switch(choice){
@@ -35,40 +34,27 @@ public class SpotifyTester {
 			case 2:addSong();break;
 			case 3:deleteSong();break;
 			case 4:findAlbum();break;
-			case 5:addAlbum();buildAlbumObjects();break;
+			case 5:addAlbum();break;
 			case 6:deleteAlbum();break;
+			case 7:findArtist();break;
+			case 8:addArtist();break;
+			case 9:deleteArtist();break;
+
 		}
 		System.out.println("Stop? y/n ");
 		if(siStrings.nextLine().equalsIgnoreCase("y"))stop = true;
-		buildAlbumObjects();buildSongObjects();
+
 		}
 		
 	}
-	private static void buildSongObjects(){
-		String sql = "SELECT song_id FROM song;";
-		songs = new ArrayList<Song>();
-		try {
-			ResultSet rs = db.getResultSet(sql);
-			while(rs.next()){
-				songs.add(new Song(rs.getString("song_id")));
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	private static void findArtist() {
+		
 	}
-	private static void buildAlbumObjects(){
-		String sql = "SELECT album_id FROM album;";
-		albums = new ArrayList<Album>();
-		try {
-			ResultSet rs = db.getResultSet(sql);
-			while(rs.next()){
-				albums.add(new Album(rs.getString("album_id")));
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	private static void addArtist() {
+		
+	}
+	private static void deleteArtist() {
+		
 	}
 	private static void deleteAlbum() {
 		Album album = findAlbum();
@@ -119,10 +105,6 @@ public class SpotifyTester {
 	private static Album findAlbum() {
 		// TODO Auto-generated method stub
 		System.out.println("Please enter the ID of the Album you are looking for, or n to cancel");
-		System.out.println("Here are the albums:");
-		for(Album album: albums){
-			System.out.println("\t"+album.getTitle()+" \n\t-> "+album.getAlbumID()+"\n");
-		}
 		Album foundAlbum = new Album(siStrings.nextLine());
 		System.out.println();
 		if(foundAlbum.getAlbumID() != null){
@@ -155,7 +137,7 @@ public class SpotifyTester {
 
 	private static void addSong() {
 		// TODO Auto-generated method stub
-		String title, filePath, recordDate, releaseDate;
+		String title, recordDate, releaseDate, albumID;
 		double length;
 		System.out.println("\nAdd a new Song");
 		System.out.println("Title: ");
@@ -171,51 +153,38 @@ public class SpotifyTester {
 		}
 		System.out.println("Release Date: ");
 		releaseDate = siStrings.nextLine();
-		System.out.println("File Path: ");
-		filePath = siStrings.nextLine();
+		System.out.println("Would you like to link this to an album? y/n");
+		albumID = null;
+//		if(siStrings.nextLine().equalsIgnoreCase("y")) {
+//			System.out.println("Please enter the Album ID: ");
+//			albumID = siStrings.nextLine();
+//			Album album = new Album(albumID);
+//			if(album.getAlbumID() != null){
+////				String sql = "INSERT INTO album_song VALUES("+songID+") WHERE"
+//			}
+//		}
 		System.out.println("Record date: ");
 		recordDate = siStrings.nextLine();
-		System.out.println("Create a new album? y/n ");
-		Album album = null;
+		
 		Song song = null;
-		if(siStrings.nextLine().equalsIgnoreCase("y")){album = addAlbum();}
-		else{
-			System.out.println("Please enter the ID of the existing Album");
-			System.out.println("Here are the Albums:");
-			for(Album lookUpAlbum: albums){
-				System.out.println("\t"+lookUpAlbum.getAlbumID()+" -> "+lookUpAlbum.getTitle());
-			}
-			Album foundAlbum = new Album(siStrings.nextLine());
-			System.out.println();
-			if(foundAlbum.getAlbumID() != null){
-				album = foundAlbum;
-			}
-		}
 		System.out.println("Creating new DB Record");
-		song = new Song(title, length, releaseDate, recordDate, album.getAlbumID());
+		song = new Song(title, length, releaseDate, recordDate);
 		System.out.println("Song Created!");
 		song = new Song(song.getSongID());
 		System.out.println("\tName: "+ song.getTitle());
 		System.out.println("\tLength: "+ song.getLength());
-		System.out.println("\tAlbum Name: "+ new Album(song.getAlbumID()).getTitle());
 	}
 
 	private static Song findSong() {
 		System.out.println("Please enter the ID of the song you are looking for");
-		System.out.println("Here are the songs:");
-		for(Song song: songs){
-			System.out.println("\t"+song.getTitle()+"\n\t-> "+song.getSongID()+"\n");
-		}
 		Song foundSong = new Song(siStrings.nextLine());
 		System.out.println();
 		if(foundSong.getSongID() != null){
-			Album album = new Album(foundSong.getAlbumID());
 			System.out.println("Found Song!\nTitle: "+foundSong.getTitle());
 			System.out.println("Length: "+foundSong.getLength());
 			System.out.println("Release Date: "+foundSong.getReleaseDate());
 			System.out.println("Release Date: "+foundSong.getReleaseDate());
 			System.out.println("File Path: "+foundSong.getFilePath());
-			System.out.println("Album Name: "+album.getTitle());
 		}else{
 			System.out.println("Couldnt find song!");
 		}
