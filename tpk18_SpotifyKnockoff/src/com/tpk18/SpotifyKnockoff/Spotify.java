@@ -4,9 +4,24 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.sql.SQLException;
+import java.util.Enumeration;
 
+import javax.swing.AbstractButton;
+import javax.swing.ButtonGroup;
+import javax.swing.ButtonModel;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JRadioButton;
+import javax.swing.JTable;
+import javax.swing.border.AbstractBorder;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
@@ -16,52 +31,89 @@ import javax.swing.table.DefaultTableModel;
 public class Spotify extends JFrame{
 	protected MainPanel panelMain;
 	protected LoginPanel panelLogin;
-	protected NewEntryPanel panelNewAccount;
+	protected NewEntryPanel panelNewEntry;
+	
+	
+	//need to add try/catch to prevent bad connection to db
 	
 	public Spotify(){
+		setTitle("Spotify KnockOff");
 		setLayout(new GridLayout(1, 1));
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setResizable(true);
+		
 		panelMain = new MainPanel();
 		panelLogin = new LoginPanel();
-		panelNewAccount = new NewEntryPanel();
+		panelNewEntry = new NewEntryPanel();
 		
 		getRootPane().setDefaultButton(this.getMainPanel().buttonSearch);
 		
 		add(panelLogin);
 		setVisible(true);
-		resetSize();
+		setInitSize();
 	}
-	public void resetSize(){
-		pack();
+	private void setInitSize(){
 		Dimension windowSize = new Dimension(600, 600);
 		setSize(windowSize);
+		pack();
 	}
-	public MainPanel getMainPanel(){
+	/**
+	 * @return void - resets frame size and repacks components
+	 */
+	private void resetSize(){
+		pack();
+	}
+	/**
+	 * 
+	 * @return MainPanel - returns MainPanel object
+	 */
+	private MainPanel getMainPanel(){
 		return this.panelMain;
 	}
-	public LoginPanel getLoginPanel(){
+	/**
+	 * 
+	 * @return MainPanel - returns LoginPanel object
+	 */
+	private LoginPanel getLoginPanel(){
 		return this.panelLogin;
 	}
-	public NewEntryPanel getNewAccountPanel(){
-		return this.panelNewAccount;
+	/**
+	 * 
+	 * @return MainPanel - returns NewEntry object
+	 */
+	private NewEntryPanel getNewEntryPanel(){
+		return this.panelNewEntry;
 	}
-	public void addSpotifyListener(){
+	/**
+	 * @return void - adds listener object to all buttons in all panels
+	 */
+	private void addSpotifyListener(){
 		ActionListener listener = new Listener();
+		MouseListener tableListener = new MouseListen();
 		panelLogin.buttonLogin.addActionListener(listener);
 		panelLogin.buttonCancel.addActionListener(listener);
-		panelNewAccount.buttonGenerate.addActionListener(listener); 
-		panelNewAccount.buttonAdd.addActionListener(listener); 
-		panelNewAccount.buttonCancel.addActionListener(listener);
+		panelNewEntry.buttonGenerate.addActionListener(listener); 
+		panelNewEntry.buttonAdd.addActionListener(listener); 
+		panelNewEntry.buttonCancel.addActionListener(listener);
 		panelMain.buttonSearch.addActionListener(listener); 
 		panelMain.buttonCancel.addActionListener(listener);
 		panelMain.buttonAddNew.addActionListener(listener); 
 		panelMain.buttonDelete.addActionListener(listener);
-		
+		panelMain.tableDataTable.addMouseListener(tableListener);
+
+		Enumeration<AbstractButton> elements = panelMain.buttonGroup.getElements();
+		while(elements.hasMoreElements()){
+			JRadioButton button = (JRadioButton) elements.nextElement();
+			button.addActionListener(listener);
+			
+		}
 		
 	}
 
-
+	/**
+	 * 
+	 * @param args - no arguments needed. Instantiates new instance of Spotify
+	 */
 	public static void main(String[] args) {
 		Spotify sp = new Spotify();
 		sp.addSpotifyListener();
@@ -69,39 +121,128 @@ public class Spotify extends JFrame{
 
 	}
 	
+	/**
+	 * 
+	 * @param searchTerm
+	 * @return DefaultTableModel - returns DefaultTableModel for use with a JTable to display data from DB
+	 */
 	public DefaultTableModel searchSongs(String searchTerm) {
 		DefaultTableModel dm = new DefaultTableModel();
-		if(searchTerm.equals(null)) {
-			
+		DbUtilities dbu = new DbUtilities();
+		String sql = "SELECT * FROM song";
+		if(searchTerm.equals("")) {
+			try {
+				dm = dbu.getDataTable(sql);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}else{
+			try {
+				dm = dbu.getDataTable(sql+" WHERE title LIKE '%"+searchTerm+"%';");
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
-		return null;
+		return dm;
 	}
+	
+	/**
+	 * 
+	 * @param searchTerm
+	 * @return DefaultTableModel - returns DefaultTableModel for use with a JTable to display data from DB
+	 */
 	public DefaultTableModel searchAlbums(String searchTerm) {
 		DefaultTableModel dm = new DefaultTableModel();
-		if(searchTerm.equals(null)) {
-			
+		DbUtilities dbu = new DbUtilities();
+		String sql = "SELECT * FROM album";
+		if(searchTerm.equals("")) {
+			try {
+				dm = dbu.getDataTable(sql);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}else{
+			try {
+				dm = dbu.getDataTable(sql+" WHERE title LIKE '%"+searchTerm+"%';");
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
-		return null;
+		return dm;
 	}
+	
+	/**
+	 * 
+	 * @param searchTerm
+	 * @return DefaultTableModel - returns DefaultTableModel for use with a JTable to display data from DB
+	 */
 	public DefaultTableModel searchArtists(String searchTerm) {
 		DefaultTableModel dm = new DefaultTableModel();
-		if(searchTerm.equals(null)) {
-			
+		DbUtilities dbu = new DbUtilities();
+		String sql = "SELECT * FROM artist";
+		if(searchTerm.equals("")) {
+			try {
+				dm = dbu.getDataTable(sql);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}else{
+			try {
+				dm = dbu.getDataTable(sql+" WHERE first_name LIKE '%"+searchTerm+"%' or last_name LIKE '%"+searchTerm+"%' or band_name LIKE '%"+searchTerm+"%';");
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
-		return null;
+		return dm;
+	}
+	public String getSelectedRadioCommand(){
+		return getMainPanel().getButtonGroup().getSelection().getActionCommand();
 	}
 	
-	
-	
-	public class TableListener implements TableModelListener{
+	public class MouseListen implements MouseListener{
 
 		@Override
-		public void tableChanged(TableModelEvent e) {
-			
+		public void mouseClicked(MouseEvent e) {
+			if(getSelectedRadioCommand() == "Album"){
+				System.out.println(new Album((String)getMainPanel().getTableDataModel().getValueAt(getMainPanel().getTable().getSelectedRow(), 0)).getTitle());
+			}else if(getSelectedRadioCommand() == "Artist"){
+				System.out.println(getMainPanel().getTableDataModel().getValueAt(getMainPanel().getTable().getSelectedRow(), 0));
+			}else if(getSelectedRadioCommand() == "Song"){
+				System.out.println(getMainPanel().getTableDataModel().getValueAt(getMainPanel().getTable().getSelectedRow(), 0));
+			}
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			// TODO Auto-generated method stub
 			
 		}
-		
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
 	}
+		
+	/**
+	 * 
+	 * @author Tommy
+	 *
+	 */
 	public class Listener implements ActionListener{
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -110,18 +251,22 @@ public class Spotify extends JFrame{
 			//MainPanel Events
 			//
 			if(source == getMainPanel().getButtonSearch()){
-				if(getMainPanel().getTextSearch().getText().equals("")){
-//					view.getMainPanel().setListAccounts(model.getAccounts());
-					getMainPanel().getButtonDelete().setEnabled(false);
-				}else{
+				String command = getSelectedRadioCommand();
+				DefaultTableModel tb = null;
 					try{
-//						view.getMainPanel().setListAccounts(model.searchAccounts(view.getMainPanel().getTextSearch().getText()));
+						if(command == "Song"){
+							tb = searchSongs(getMainPanel().getTextSearch().getText());
+						}else if(command == "Artist"){
+							tb = searchArtists(getMainPanel().getTextSearch().getText());
+						}else if(command == "Album"){
+							tb = searchAlbums(getMainPanel().getTextSearch().getText());
+						}
+						getMainPanel().setTableDataModel(tb);
 						getMainPanel().getButtonDelete().setEnabled(true);
 					}catch(NullPointerException pointerException){
-						JOptionPane.showMessageDialog(panelMain, "Could not find specified site");
+						JOptionPane.showMessageDialog(panelMain, "Could not find specified entry");
 						getMainPanel().getButtonDelete().setEnabled(false);
 					}
-				}
 
 			}
 			else if(source == getMainPanel().getButtonCancel()){
@@ -131,7 +276,21 @@ public class Spotify extends JFrame{
 			}
 			else if(source == getMainPanel().getButtonAddNew()){
 				remove(getMainPanel());
-				add(getNewAccountPanel());
+				add(getNewEntryPanel());
+				String command = getSelectedRadioCommand();
+				if(command == "Artist"){
+					
+					String[] array = {"Title", "Recording Company"};
+					getNewEntryPanel().setFields(array);
+					
+				}else if(command == "Album"){
+					String[] array = {"Title", "Recording Company"};
+					getNewEntryPanel().setFields(array);
+					
+				}else if(command == "Song"){
+					String[] array = {"Title", "Recording Company"};
+					getNewEntryPanel().setFields(array);
+				}
 				resetSize();
 
 			}else if(source == getMainPanel().getButtonDelete()){
@@ -144,39 +303,47 @@ public class Spotify extends JFrame{
 //					getMainPanel().resetTextSearch();
 //					getMainPanel().getButtonDelete().setEnabled(false);
 //				}
+			}else if((getMainPanel().getButtonRadios().contains(source))){
+				String command = getMainPanel().getButtonGroup().getSelection().getActionCommand();
+				DefaultTableModel tb = null;
+				if(command == "Artist"){
+					tb = searchArtists("");
+				}else if(command == "Album"){
+					tb = searchAlbums("");
+				}else if(command == "Song"){
+					tb = searchSongs("");
+					
+				}
+				getMainPanel().setTableDataModel(tb);
 			}
+			
 			//
 			//NewAccountPanel Events
 			//
-			else if(source == getNewAccountPanel().getButtonGenerate()){
+			else if(source == panelNewEntry.getButtonGenerate()){
 //				getNewAccountPanel().getTextPassword().setText(PassGen.generatePassword());
 				
-			}else if(source == getNewAccountPanel().getButtonAdd()){
+			}else if(source == panelNewEntry.getButtonAdd()){
 
-					String siteName = getNewAccountPanel().getTextSite().getText();
-					String userName = getNewAccountPanel().getTextUserName().getText();
-					String passWord = getNewAccountPanel().getTextPassword().getText();
-					if(siteName.equals("")){
-						JOptionPane.showMessageDialog(panelNewAccount, "Please enter a Site name");
-					}if(userName.equals("")){
-						JOptionPane.showMessageDialog(panelNewAccount, "Please enter a Username ");
-					}if(passWord.equals("")){
-						JOptionPane.showMessageDialog(panelNewAccount, "Please enter a Password");
-					}if(!siteName.equals("")&&!userName.equals("")&&!passWord.equals("")){
+//					String siteName = getNewEntryPanel().getTextSite().getText();
+//					String userName = getNewEntryPanel().getTextUserName().getText();
+//					String passWord = getNewEntryPanel().getTextPassword().getText();
+//					if(siteName.equals("")){
+//						JOptionPane.showMessageDialog(panelNewEntry, "Please enter a Site name");
+//					}if(userName.equals("")){
+//						JOptionPane.showMessageDialog(panelNewEntry, "Please enter a Username ");
+//					}if(passWord.equals("")){
+//						JOptionPane.showMessageDialog(panelNewEntry, "Please enter a Password");
+//					}if(!siteName.equals("")&&!userName.equals("")&&!passWord.equals("")){
 //					Account newAccount = new Account(siteName, userName, passWord);
 //					addAccount(newAccount);
-					getNewAccountPanel().setTextSite("");
-					getNewAccountPanel().setTextPassword("");
-					getNewAccountPanel().setTextUserName("");
+
 //					JOptionPane.showMessageDialog(this, "Here is your account info:\n"+newAccount.toString());
-					}
+//					}
 
 			
-			}else if(source == getNewAccountPanel().getButtonCancel()){
-				getNewAccountPanel().getTextSite().setText("");
-				getNewAccountPanel().getTextUserName().setText("");
-				getNewAccountPanel().getTextPassword().setText("");
-				remove(getNewAccountPanel());
+			}else if(source == getNewEntryPanel().getButtonCancel()){
+				remove(getNewEntryPanel());
 				add(getMainPanel());
 //				getMainPanel().setListAccounts(null);
 				resetSize();
@@ -188,7 +355,9 @@ public class Spotify extends JFrame{
 			else if(source == getLoginPanel().getButtonLogin()){
 				remove(getLoginPanel());
 				add(getMainPanel());
-//				getMainPanel().setListAccounts(getAccounts());
+				DefaultTableModel tb = null;
+				tb = searchAlbums("");
+				getMainPanel().setTableDataModel(tb);
 				resetSize();
 				/*
 				if(model.login(view.getLoginPanel().getTextUserName().getText(), view.getLoginPanel().getTextPassword().getText())){
@@ -204,6 +373,7 @@ public class Spotify extends JFrame{
 			}else if(source == getLoginPanel().getButtonCancel()){
 				System.exit(0);
 			}
+			
 			
 		}
 	}

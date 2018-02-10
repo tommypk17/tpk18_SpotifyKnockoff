@@ -10,13 +10,10 @@ import javax.swing.*;
 @SuppressWarnings("serial")
 public class NewEntryPanel extends JPanel{
 	
-	private JLabel labelSite;
-	private JLabel labelUserName;
-	private JLabel labelPassword;
+	private JLabel labelLine;
+	private String[] labels = {"item1","item2","item3"};
 	
-	protected JTextField textSite;
-	protected JTextField textUserName;
-	protected JTextField textPassword;
+	protected JTextField textBox;
 	
 	protected JButton buttonGenerate;
 	protected JButton buttonAdd;
@@ -29,40 +26,19 @@ public class NewEntryPanel extends JPanel{
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx = 1;
 		
-		labelSite = new JLabel("Site:");
-		c.gridx = 0;
-		c.gridy = 0;
-		add(labelSite, c);
-		
-		labelUserName = new JLabel("Username:");
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridx = 0;
-		c.gridy = 1;
-		add(labelUserName, c);
-		
-		labelPassword = new JLabel("Password:");
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridx = 0;
-		c.gridy = 2;
-		add(labelPassword, c);
-		
-		textSite = new JTextField();
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridx = 1;
-		c.gridy = 0;
-		add(textSite, c);
-		
-		textUserName = new JTextField();
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridx = 1;
-		c.gridy = 1;
-		add(textUserName, c);
-		
-		textPassword = new JTextField();
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridx = 1;
-		c.gridy = 2;
-		add(textPassword, c);
+		for(int i = 0; i < labels.length; i++){
+			labelLine = new JLabel(labels[i]);
+			c.gridx = 0;
+			c.gridy = i;
+			add(labelLine, c);
+			
+			textBox = new JTextField();
+			textBox.setName(labels[i]);
+			c.fill = GridBagConstraints.HORIZONTAL;
+			c.gridx = 1;
+			c.gridy = i;
+			add(textBox, c);
+		}
 		
 		buttonGenerate = new JButton("Generate");
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -98,25 +74,12 @@ public class NewEntryPanel extends JPanel{
 	}
 
 	public JTextField getTextPassword() {
-		return textPassword;
+		return textBox;
 	}
-	public JTextField getTextSite() {
-		return textSite;
-	}
-
-	public JTextField getTextUserName() {
-		return textUserName;
+	public void setFields(String[] fieldNames){
+		this.labels = fieldNames;
 	}
 
-	public void setTextSite(String textSite) {
-		this.textSite.setText(textSite);
-	}
 
-	public void setTextUserName(String textUserName) {
-		this.textUserName.setText(textUserName);
-	}
-	public void setTextPassword(String textPassword) {
-		this.textPassword.setText(textPassword);
-	}
 	
 }
