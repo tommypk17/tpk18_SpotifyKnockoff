@@ -4,14 +4,23 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
+/**
+*
+* @author Thomas P. Kovalchuk
+* @version 1.0
+*/
 public class Artist {
 	private String artistID;
 	private String firstName; 
 	private String lastName;
 	private String bandName;
 	private String bio;
+	
+	private Map<String, Song> artistSongs = new HashMap<>();
     /**
      * Constructor - creates a new Artist with parameters, used to add new Artist to database.
      * @param firstName - string value of the artist's first name
@@ -39,6 +48,7 @@ public class Artist {
 			db.closeDbConnection();
 			db = null;
 		} catch (SQLException e) {
+			ErrorLogger.log(e.getMessage());
 			e.printStackTrace();
 		}
 	}
@@ -48,9 +58,11 @@ public class Artist {
      */
 	public Artist(String artistID) {
 		String sql = "SELECT * FROM artist WHERE artist_id = '" + artistID + "';";
-		DbUtilities db = new DbUtilities();
+		DbUtilities db;
+		ResultSet rs;
 		try {
-			ResultSet rs = db.getResultSet(sql);
+			db = new DbUtilities();
+			rs = db.getResultSet(sql);
 			while(rs.next()){
 				this.artistID = rs.getString("artist_id");
 				this.firstName = rs.getString("first_name");
@@ -58,12 +70,36 @@ public class Artist {
 				this.bandName = rs.getString("band_name");
 				this.bio = rs.getString("bio");
 			}
+			sql = "SELECT * FROM song LEFT JOIN song_artist ON song.song_id = song_artist.fk_song_id WHERE song_artist.fk_artist_id='"+ artistID + "';";
+			rs = db.getResultSet(sql);
+			while(rs.next()){
+				Song song = new Song(rs.getString("song_id"), rs.getString("title"), rs.getDouble("length"), rs.getString( "release_date"), rs.getString( "record_date"));
+				song.setFilePath(rs.getString("file_path"));
+				this.artistSongs.put(song.getSongID(), song);
+				song = null;
+			}
 			db.closeDbConnection();
-			db = null;
 		} catch (SQLException e) {
+			ErrorLogger.log(e.getMessage());
 			e.printStackTrace();
+		}finally{
+			db = null;
+			rs = null;
 		}
 		
+	}
+    /**
+     * Alternative Constructor - creates a new Artist with parameters, used to add new Artist to database.
+     * @param artistID -  string value of the artist's id
+     * @param firstName - string value of the artist's first name
+     * @param lastName - string value of the artist's last name
+     * @param bandName - string value of the artist's band name
+     */
+	public Artist(String artistId, String firstName, String lastName, String bandName) {
+		this.artistID = artistId;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.bandName = bandName;
 	}
     /**
      * This method is used to remove a specific Artist based on the artistID as a String
@@ -107,6 +143,19 @@ public class Artist {
 	public String getBio() {
 		return bio;
 	}
+    /**
+     * @return MapList of Songs for Artist Instance
+     */
+	public Map<String, Song> getArtistSongs() {
+		return artistSongs;
+	}
+	/**
+	 * 
+	 * @return Object[] - returns Object[] containing Song instance variables
+	 */
+	public Object[] toArray(){
+		return new Object[] {this.artistID, this.firstName, this.lastName, this.bandName, this.bio};
+	}
 	public void setBio(String bio) {
 		this.bio = bio;
 		String sql = "UPDATE artist SET bio = '"+bio+"' WHERE artist_id = '"+this.artistID+"';";
@@ -116,6 +165,7 @@ public class Artist {
 			db.closeDbConnection();
 			db = null;
 		} catch (Exception e) {
+			ErrorLogger.log(e.getMessage());
 			e.printStackTrace();
 		}
 		

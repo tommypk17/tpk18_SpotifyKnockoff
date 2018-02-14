@@ -2,6 +2,11 @@ package com.tpk18.SpotifyKnockoff;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
+/**
+*
+* @author Thomas P. Kovalchuk
+* @version 1.0
+*/
 public class SpotifyTester {
 	static Scanner siStrings = new Scanner(System.in);
 	static Scanner siDoubles = new Scanner(System.in);

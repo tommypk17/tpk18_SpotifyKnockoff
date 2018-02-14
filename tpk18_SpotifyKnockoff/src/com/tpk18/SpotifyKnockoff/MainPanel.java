@@ -4,13 +4,10 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
-
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -20,7 +17,11 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
-
+/**
+*
+* @author Thomas P. Kovalchuk
+* @version 1.0
+*/
 @SuppressWarnings("serial")
 public class MainPanel extends JPanel{	
 	protected JTextField textSearch;
@@ -44,7 +45,6 @@ public class MainPanel extends JPanel{
 	
 	protected String[] buttonTitles = {"Search", "Cancel", "Add New Entry", "Delete"};
 	protected String[] buttonRadioNames = {"Album","Artist", "Song"};
-	protected String[] tableColumnNames;
 	
 	
 	public MainPanel(){
@@ -63,6 +63,7 @@ public class MainPanel extends JPanel{
 		add(textSearch, c);
 		
 //		adding radio buttons
+		c.weightx = 0;
 		c.weighty = 0;
 		c.gridx = 3;
 		c.gridy = 1;
@@ -83,16 +84,14 @@ public class MainPanel extends JPanel{
 			if(buttonRadio.getActionCommand() == "Album")buttonRadio.setSelected(true);
 		}
 		add(panelRadioButtons, c);
-		
-//		adding column names to table
-
 
 //		adding table
+		c.weightx = 1;
 		c.weighty = 1;
 		tableDataTable = new JTable(tableDataModel);
-//		tableDataModel.ise
+		tableDataTable.setAutoResizeMode(JTable.AUTO_RESIZE_NEXT_COLUMN);
 		textScrollStorage = new JScrollPane(tableDataTable);
-		textScrollStorage.setPreferredSize(new Dimension(400, 300));
+		textScrollStorage.setPreferredSize(new Dimension(600, 400));
 		textScrollStorage.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 0;
@@ -119,19 +118,19 @@ public class MainPanel extends JPanel{
 		add(buttonCancel, c);
 		
 //		adding new entry button
-		buttonAddNew = new JButton(buttonTitles[2]);
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridx = 0;
-		c.gridy = 2;
-		add(buttonAddNew, c);
-		
+//		buttonAddNew = new JButton(buttonTitles[2]);
+//		c.fill = GridBagConstraints.HORIZONTAL;
+//		c.gridx = 0;
+//		c.gridy = 2;
+//		add(buttonAddNew, c);
+//		
 //		adding delete button
-		buttonDelete = new JButton(buttonTitles[3]);
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridx = 1;
-		c.gridy = 2;
-		buttonDelete.setEnabled(false);
-		add(buttonDelete, c);	
+//		buttonDelete = new JButton(buttonTitles[3]);
+//		c.fill = GridBagConstraints.HORIZONTAL;
+//		c.gridx = 1;
+//		c.gridy = 2;
+//		buttonDelete.setEnabled(false);
+//		add(buttonDelete, c);	
 		
 		
 		
@@ -187,14 +186,6 @@ public class MainPanel extends JPanel{
 	 */
 	public void resetTextSearch(){
 		textSearch.setText("");
-	}
-	/**
-	 * 
-	 * @return void - sets the column names
-	 * @param tableColumnNames - takes String[]
-	 */
-	public void setTableColumnNames(String[] tableColumnNames) {
-		this.tableColumnNames = tableColumnNames;
 	}
 	/**
 	 * 

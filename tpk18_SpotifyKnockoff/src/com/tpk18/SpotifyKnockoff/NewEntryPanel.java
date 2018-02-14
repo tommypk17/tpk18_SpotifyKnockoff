@@ -6,7 +6,11 @@ import java.awt.Insets;
 
 import javax.swing.*;
 
-
+/**
+*
+* @author Thomas P. Kovalchuk
+* @version 1.0
+*/
 @SuppressWarnings("serial")
 public class NewEntryPanel extends JPanel{
 	

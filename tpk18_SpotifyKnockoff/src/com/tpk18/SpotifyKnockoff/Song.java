@@ -4,11 +4,16 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 import java.util.UUID;
 
-
-
+/**
+ *
+ * @author Thomas P. Kovalchuk
+ * @version 1.0
+ */
 public class Song {
 	private String songID;
 	private String title;
@@ -16,7 +21,7 @@ public class Song {
 	private String filePath;
 	private String releaseDate;
 	private String recordDate;
-	private Map<String, Artist> songArtists;
+	private Map<String, Artist> songArtists = new HashMap<>();
 	
 	/**
 	 * Alternate Constructor - creates a new Artist, used to pull data from DB and sets instance variables with that data.
@@ -24,9 +29,11 @@ public class Song {
 	 */
 	public Song(String songID) {
 		String sql = "SELECT * FROM song WHERE song_id = '" + songID + "';";
-		DbUtilities db = new DbUtilities();
+		DbUtilities db;
+		ResultSet rs;
 		try {
-			ResultSet rs = db.getResultSet(sql);
+			db = new DbUtilities();
+			rs = db.getResultSet(sql);
 			while(rs.next()){
 				this.songID = rs.getString("song_id");
 				this.title = rs.getString("title");
@@ -35,8 +42,19 @@ public class Song {
 				this.recordDate = rs.getDate("record_date").toString();
 				this.length = rs.getDouble("length");
 			}
+			sql = "SELECT * FROM artist LEFT JOIN song_artist ON artist.artist_id = song_artist.fk_artist_id WHERE song_artist.fk_song_id='"+ songID + "';";
+			rs = db.getResultSet(sql);
+			while(rs.next()){
+				Artist artist = new Artist(rs.getString("artist_id"), rs.getString("first_name"), rs.getString("last_name"), rs.getString( "band_name"));
+				this.songArtists.put(artist.getArtistID(), artist);
+				artist = null;
+			}
 		} catch (SQLException e) {
+			ErrorLogger.log(e.getMessage());
 			e.printStackTrace();
+		}finally{
+			db = null;
+			rs = null;
 		}
 				
 	}
@@ -56,11 +74,13 @@ public class Song {
 		
 		String sql = "INSERT INTO song (song_id,title,length,release_date,record_date) ";
 		sql += "VALUES (?, ?, ?, ?, ?);";
-		
+		PreparedStatement ps;
+		Connection conn;
+		DbUtilities db;
 		try {
-			DbUtilities db = new DbUtilities();
-			Connection conn = db.getConn();
-			PreparedStatement ps = conn.prepareStatement(sql);
+			db = new DbUtilities();
+			conn = db.getConn();
+			ps = conn.prepareStatement(sql);
 			ps.setString(1, this.songID);
 			ps.setString(2,  this.title);
 			ps.setDouble(3, this.length);
@@ -70,8 +90,30 @@ public class Song {
 			db.closeDbConnection();
 			db = null;
 		} catch (SQLException e) {
+			ErrorLogger.log(e.getMessage());
 			e.printStackTrace();
+		}finally{
+			db = null;
+			ps = null;
+			conn = null;
 		}
+	}
+	/**
+	 * Alternate Constructor - creates a new Artist object. No db connection.
+	 * @param songID - string value of the song id
+	 * @param title - string value of the song title
+	 * @param length - double value of the song length of time
+	 * @param releaseDate  - string value of the song release date
+	 * @param recordDate - string value of the song's date recorded
+	 */
+	public Song(String songID, String title, double length, String releaseDate, String recordDate) {
+				this.songID = songID;
+				this.title = title;
+				this.releaseDate = releaseDate;
+				this.recordDate = recordDate;
+				this.length = length;
+
+				songArtists = new Hashtable<>();
 	}
 
     /**
@@ -93,6 +135,27 @@ public class Song {
      */
 	public void addArtist(Artist artist) {
 		this.songArtists.put(artist.getArtistID(), artist);
+		String sql = "INSERT INTO song_artist (fk_song_id, fk_artist_id) VALUES (?,?);";
+		DbUtilities db;
+		Connection conn;
+		PreparedStatement ps;
+		try {
+			db = new DbUtilities();
+			conn = db.getConn();
+			ps = conn.prepareStatement(sql);
+			ps.setString(1, this.songID);
+			ps.setString(1, artist.getArtistID());
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			ErrorLogger.log(e.getMessage());
+			e.printStackTrace();
+		}finally{
+			db = null;
+			conn = null;
+			ps = null;
+		}
+		
+		
 	}
     /**
      * This method is used to remove a specific Artist from this Song's Artist MapList
@@ -152,17 +215,31 @@ public class Song {
 	public Map<String, Artist> getSongArtists() {
 		return songArtists;
 	}
+	/**
+	 * 
+	 * @return Object[] - returns Object[] containing Song instance variables
+	 */
+	public Object[] toArray(){
+		return new Object[] {this.songID, this.title, this.length, this.filePath, this.releaseDate, this.recordDate};
+	}
 	public void setFilePath(String filePath) {
 		this.filePath = filePath;
-		String sql = "UPDATE song SET file_path = '"+filePath+"' WHERE song_id = '"+this.songID+"';";
-		
+		String sql = "UPDATE song SET file_path = (?) WHERE song_id = '"+this.songID+"';";
+		DbUtilities db;
+		Connection conn;
+		PreparedStatement ps;
 		try {
-			DbUtilities db = new DbUtilities();
-			db.executeQuery(sql);
+			db = new DbUtilities();
+			conn = db.getConn();
+			ps = conn.prepareStatement(sql);
+			ps.setString(1, filePath);
+			ps.executeUpdate();
 			db.closeDbConnection();
-			db = null;
 		} catch (Exception e) {
+			ErrorLogger.log(e.getMessage());
 			e.printStackTrace();
+		}finally{
+			db = null;
 		}
 	}
 	

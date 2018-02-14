@@ -71,8 +71,8 @@ public class DbUtilities {
             // Connect to the database
             conn = DriverManager.getConnection(mySqlConn);
         } catch (Exception e) {
-            System.err.print(e.toString());
-            System.err.println("Unable to connect to database");
+            ErrorLogger.log(e.getMessage());
+//            System.err.println("Unable to connect to database");
         }
     }
     /**
@@ -87,7 +87,8 @@ public class DbUtilities {
 			this.conn.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			ErrorLogger.log(e.getMessage());
+//			e.printStackTrace();
 		}
     	this.conn = null;
     }
@@ -96,20 +97,24 @@ public class DbUtilities {
      * Get SQL result set (data set) based on an SQL query
      * @param sql - SQL SELECT query
      * @return - ResultSet - java.sql.ResultSet object, contains results from SQL query argument
-     * @throws SQLException
+     * @throws SQLException, NullPointerException
      */
 
-    public ResultSet getResultSet(String sql) throws SQLException {  
+    public ResultSet getResultSet(String sql) throws SQLException, NullPointerException {  
         try {
             if(conn == null){ // Check if connection object already exists
                 createDbConnection(); // If does not exist, create new connection
             }
             Statement statement = conn.createStatement();
             return statement.executeQuery(sql); // Return ResultSet
+        }catch(NullPointerException v){
+        	ErrorLogger.log(v.getMessage());
+        	throw new NullPointerException(); 
+        	
         } catch (Exception e) {
-        	e.printStackTrace(); // debug
-//            ErrorLogger.log(e.getMessage()); // Log error
-//            ErrorLogger.log(sql); // Log SELECT query
+//        	e.printStackTrace(); // debug
+            ErrorLogger.log(e.getMessage()); // Log error
+            ErrorLogger.log(sql); // Log SELECT query
         }
         return null;
     }
@@ -128,9 +133,9 @@ public class DbUtilities {
             statement.executeUpdate(sql); // execute query
             return true;
         } catch (Exception e) {
-        	e.printStackTrace(); // debug
-//            ErrorLogger.log(e.getMessage()); // Log error
-//            ErrorLogger.log(sql); // Log INSERT, UPDATE, DELETE query
+//        	e.printStackTrace(); // debug
+            ErrorLogger.log(e.getMessage()); // Log error
+            ErrorLogger.log(sql); // Log INSERT, UPDATE, DELETE query
         }
         return false;
     }
@@ -142,13 +147,21 @@ public class DbUtilities {
      * @return a model for JTable
      * @throws SQLException
      */
-    public DefaultTableModel getDataTable(String sql) throws SQLException{
-    	ResultSet rs = getResultSet(sql);
-    	
+    public DefaultTableModel getDataTable(String sql) throws SQLException, NullPointerException{
+    	ResultSet rs = null;
+    	ResultSetMetaData metaData = null;
+    	try{
+    	rs = getResultSet(sql);
+    	metaData = rs.getMetaData();
+    	}catch(NullPointerException v){
+    		ErrorLogger.log(v.getMessage());
+    		throw new NullPointerException();
+    	}catch(Exception e){
+    		ErrorLogger.log(e.getMessage());
+    	}
     	/* Metadata object contains additional information about a ResulSet, 
     	 * such as database column names, data types, etc...
     	 */
-		ResultSetMetaData metaData = rs.getMetaData();
 		
 		// Get column names from the metadata object and store them in a Vector variable
 		Vector<String> columnNames = new Vector<String>();
