@@ -14,7 +14,7 @@ public class SongController {
 		songFactory = Persistence.createEntityManagerFactory("tpk18_SpotifyKnockoff");
 		songManager = songFactory.createEntityManager();
 	}
-	public void createSong(String title, double length, String filePath, String releaseDate, String recordDate){
+	public Song createSong(String title, double length, String filePath, String releaseDate, String recordDate){
 		songManager.getTransaction().begin();
 		Song s = new Song();
 		s.setSongID(UUID.randomUUID().toString());
@@ -25,15 +25,17 @@ public class SongController {
 		s.setFilePath(filePath);
 		songManager.persist(s);
 		songManager.getTransaction().commit();
+		return s;
 	}
-	public void deleteSong(String songID){
+	public Song deleteSong(String songID){
 		songManager.getTransaction().begin();
 		Song s = songManager.find(Song.class, songID);
 		songManager.remove(s);
 		songManager.persist(s);
 		songManager.getTransaction().commit();
+		return s;
 	}
-	public void updateSong(String songID, String parameterToChange, String param){
+	public Song updateSong(String songID, String parameterToChange, String param){
 		songManager.getTransaction().begin();
 		Song s = songManager.find(Song.class, songID);
 		if(parameterToChange == "title"){
@@ -49,6 +51,7 @@ public class SongController {
 		}
 		songManager.persist(s);
 		songManager.getTransaction().commit();
+		return s;
 	}
 	
 	

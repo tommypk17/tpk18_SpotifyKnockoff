@@ -1,2 +1,4 @@
 Wed Feb 21 22:35:02 EST 2018 Unparseable date: "2018/02/21"
 Wed Feb 21 22:35:02 EST 2018 Unparseable date: "2018/02/21"
+Fri Feb 23 20:54:03 EST 2018 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'm like, really cool' WHERE artist_id = '674af882-6fb0-441c-8169-bdff3194f31f'' at line 1
+Fri Feb 23 20:54:03 EST 2018 UPDATE artist SET bio = 'I'm like, really cool' WHERE artist_id = '674af882-6fb0-441c-8169-bdff3194f31f';

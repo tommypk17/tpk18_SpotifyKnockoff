@@ -8,19 +8,47 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 /**
 *
 * @author Thomas P. Kovalchuk
 * @version 1.0
 */
+@Entity
+@Table (name = "artist")
 public class Artist {
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column (name = "artist_id")
 	private String artistID;
+	
+	@Column (name = "first_name")
 	private String firstName; 
+	
+	@Column (name = "last_name")
 	private String lastName;
+	
+	@Column (name = "band_name")
 	private String bandName;
+	
+	@Column (name = "bio")
 	private String bio;
 	
+	@Transient
 	private Map<String, Song> artistSongs = new HashMap<>();
+	
+	public Artist(){
+		super();
+	}
+	
     /**
      * Constructor - creates a new Artist with parameters, used to add new Artist to database.
      * @param firstName - string value of the artist's first name
@@ -28,6 +56,7 @@ public class Artist {
      * @param bandName - string value of the artist's band name
      */
 	public Artist(String firstName, String lastName, String bandName) {
+		super();
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.bandName = bandName;
@@ -57,6 +86,7 @@ public class Artist {
      * @param artistID - string value of the artist id
      */
 	public Artist(String artistID) {
+		super();
 		String sql = "SELECT * FROM artist WHERE artist_id = '" + artistID + "';";
 		DbUtilities db;
 		ResultSet rs;
@@ -96,6 +126,7 @@ public class Artist {
      * @param bandName - string value of the artist's band name
      */
 	public Artist(String artistId, String firstName, String lastName, String bandName) {
+		super();
 		this.artistID = artistId;
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -169,6 +200,21 @@ public class Artist {
 			e.printStackTrace();
 		}
 		
+	}
+	public void setArtistID(String artistID) {
+		this.artistID = artistID;
+	}
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+	public void setBandName(String bandName) {
+		this.bandName = bandName;
+	}
+	public void setArtistSongs(Map<String, Song> artistSongs) {
+		this.artistSongs = artistSongs;
 	}
 
 }

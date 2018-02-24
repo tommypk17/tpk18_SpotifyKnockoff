@@ -8,6 +8,16 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import java.util.UUID;
 
 /**
@@ -15,16 +25,44 @@ import java.util.UUID;
 * @author Thomas P. Kovalchuk
 * @version 1.0
 */
+@Entity
+@Table (name = "album")
 public class Album {
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column (name = "album_id")
 	private String albumID;
+	
+	@Column (name = "title")
 	private String title;
+	
+	@Column (name = "release_date")
+	@Convert(converter = DateConverter.class)
 	private String releaseDate;
+	
+	@Column (name = "cover_image_path")
 	private String coverImagePath;
+	
+	@Column (name = "recording_company_name")
 	private String recordingCompany;
+	
+	@Column (name = "number_of_tracks")
 	private int numberOfTracks;
+	
+	@Column (name = "PMRC_rating")
 	private String pmrcRating;
+	
+	@Column (name = "length")
 	private double length;
+	
+	@Transient
 	private Map<String, Song> albumSongs = new HashMap<>();
+	
+	
+	public Album(){
+		super();
+	}
 	
 	/**
 	 * Constructor - creates a new Album with parameters, used to add new Album to database.
@@ -36,6 +74,7 @@ public class Album {
 	 * @param length - double value of the total play time of the album
 	 */
 	public Album(String title, String releaseDate, String recordingCompany, int numberOfTracks, String pmrcRating, double length) {
+		super();
 		this.albumID = UUID.randomUUID().toString();
 		this.title = title;
 		this.releaseDate = releaseDate;
@@ -80,6 +119,7 @@ public class Album {
 	 * @param albumID - string value of the album id
 	 */
 	public Album(String albumID) {
+		super();
 		String sql = "SELECT * FROM album WHERE album_id = '" + albumID + "';";
 		DbUtilities db;
 		ResultSet rs;
@@ -124,6 +164,7 @@ public class Album {
 	 * @param length - double value of the total play time of the album
 	 */
 	public Album(String albumID, String title, String releaseDate, String recordingCompany, int numberOfTracks, String pmrcRating, double length) {
+		super();
 		this.albumID = albumID;
 		this.title = title;
 		this.releaseDate = releaseDate;
@@ -255,6 +296,38 @@ public class Album {
      */
 	public Map<String, Song> getAlbumSongs() {
 		return albumSongs;
+	}
+
+	public void setAlbumID(String albumID) {
+		this.albumID = albumID;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public void setReleaseDate(String releaseDate) {
+		this.releaseDate = releaseDate;
+	}
+
+	public void setRecordingCompany(String recordingCompany) {
+		this.recordingCompany = recordingCompany;
+	}
+
+	public void setNumberOfTracks(int numberOfTracks) {
+		this.numberOfTracks = numberOfTracks;
+	}
+
+	public void setPmrcRating(String pmrcRating) {
+		this.pmrcRating = pmrcRating;
+	}
+
+	public void setLength(double length) {
+		this.length = length;
+	}
+
+	public void setAlbumSongs(Map<String, Song> albumSongs) {
+		this.albumSongs = albumSongs;
 	}
 	
 }
