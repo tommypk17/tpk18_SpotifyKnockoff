@@ -6,12 +6,10 @@
 		<class>com.tpk18.SpotifyKnockoff.Album</class>
 		<class>com.tpk18.SpotifyKnockoff.DateConverter</class>
 		<properties>
-			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/spotify_knockoff"/>
+<!--			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/spotify_knockoff"/> -->
+			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://sis-teach-01.sis.pitt.edu:3306/spotify_knockoff"/>
 			<property name="javax.persistence.jdbc.user" value="spotifyUser"/>
 			<property name="javax.persistence.jdbc.password" value="spotifyUser123"/>
-<!--		<property name="javax.persistence.jdbc.url" value="jdbc:mysql://sis-teach-01.sis.pitt.edu:3306/spotify_knockoff"/>
-			<property name="javax.persistence.jdbc.user" value="spotifyUser"/>
-			<property name="javax.persistence.jdbc.password" value="spotifyUser123"/> -->
 			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
 			<property name="eclipselink.logging.level" value="FINE"/>
 		</properties>
