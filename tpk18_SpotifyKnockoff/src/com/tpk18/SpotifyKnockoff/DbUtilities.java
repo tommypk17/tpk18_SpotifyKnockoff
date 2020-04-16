@@ -21,16 +21,16 @@ import javax.swing.table.DefaultTableModel;
 public class DbUtilities {
 
     private Connection conn = null; // connection object
-    private String hostName = "sis-teach-01.sis.pitt.edu"; // server address + port number
-    private String dbName = "spotify_knockoff"; // default database name
-    private String dbUserName = "spotifyUser"; // login name for the database server
-    private String dbPassword = "spotifyUser123"; // password for the database server
+    private String hostName = ""; // server address + port number
+    private String dbName = ""; // default database name
+    private String dbUserName = ""; // login name for the database server
+    private String dbPassword = ""; // password for the database server
     
 //    LOCAL DB CONNECTION
-//    private String hostName = "localhost"; // server address + port number
-//    private String dbName = "spotify_knockoff"; // default database name
-//    private String dbUserName = "spotifyUser"; // login name for the database server
-//    private String dbPassword = "spotifyUser123"; // password for the database server
+//    private String hostName = ""; // server address + port number
+//    private String dbName = ""; // default database name
+//    private String dbUserName = ""; // login name for the database server
+//    private String dbPassword = ""; // password for the database server
     /**
      * Default constructor creates a connection to database at the time of instantiation.
      */
